@@ -1,21 +1,36 @@
+# on: [push]
+
+# jobs:
+#   deploy_job:
+#     runs-on: ubuntu-latest
+#     name: build&deploy
+#     steps:
+#         # To use this repository's private action, you must check out the repository
+#         - name: Checkout
+#         - uses: actions/checkout@v2
+
+
+#         - name: deploy file to server
+#           uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+#           with:
+#             username: ${{ secrets.USER }}
+#             server: ${{ secrets.HOST }}
+#             ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+#             local_path: ./*
+#             remote_path: /home/ec2-user/git action
+#             sftpArgs: '-o ConnectTimeout=5'
+            
+            
+name: Updates files
 on: [push]
-
 jobs:
-  deploy_job:
-    runs-on: ubuntu-latest
-    name: build&deploy
+  run:
+    runs-on: [ubuntu-latest]
     steps:
-        # To use this repository's private action, you must check out the repository
-        - name: Checkout
-        - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
 
-
-        - name: deploy file to server
-          uses: wlixcc/SFTP-Deploy-Action@v1.2.4
-          with:
-            username: ${{ secrets.USER }}
-            server: ${{ secrets.HOST }}
-            ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-            local_path: ./*
-            remote_path: /home/ec2-user/git action
-            sftpArgs: '-o ConnectTimeout=5'
+    - name: Make copy of my_file.json
+      run: |
+        chmod u+x "${GITHUB_WORKSPACE}/copyfile.sh"
+        bash "${GITHUB_WORKSPACE}/copyfile.sh"            
