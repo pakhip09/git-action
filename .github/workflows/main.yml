@@ -1,0 +1,42 @@
+name: sync deployment
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+#  pull_request:
+#    branches: [ main ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "SFTP"
+  deploy-via-sftp:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - name: SFTP Deploy
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.1
+        with:
+          username: ${{ secrets.USER }}
+          server: ${{ secrets.HOST }}
+          port: ${{ secrets.PORT }}  # default is 22
+          ssh_private_key: ${{ secrets.KEY }}
+          # will put all file under this path
+          local_path: ./* # default is ./*
+          # files will copy to under remote_path
+          remote_path: /home/ec2-user/testing_git
+          # sftp args
+          args: '-o ConnectTimeout=5'
+      - name: ssh server
+        uses: D3rHase/ssh-command-action@v0.2
+        with:
+          HOST: ${{ secrets.HOST }}                              # Remote server address / ip - Required: true
+          PORT: ${{ secrets.PORT }}  # default is 22                             # Remote server port -  Default: 22 - Required: false
+          USER: ${{ secrets.USER }}                              # Remote server user - Required: true
+          PRIVATE_SSH_KEY: ${{ secrets.KEY }}       # Private ssh key registered on the remote server - Required: true
+          COMMAND: |
+               ls
+               whoami
+               ps -aufx
